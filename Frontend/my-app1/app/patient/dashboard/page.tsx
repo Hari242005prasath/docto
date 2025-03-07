@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
+import { JSX, SVGProps } from "react"
 
 export default function PatientDashboard() {
   return (
@@ -203,22 +204,6 @@ export default function PatientDashboard() {
               </Card>
             </div>
 
-            {/* Upload Documents Card */}
-            <Card className="bg-gradient-to-r from-teal-50 to-blue-50">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold">Upload Medical Documents</h3>
-                    <p className="text-gray-500">Upload your medical reports, X-rays, or photos for AI analysis</p>
-                  </div>
-                  <Button className="gap-2">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload Documents</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Services Section */}
             <Card>
               <CardHeader>
@@ -226,42 +211,67 @@ export default function PatientDashboard() {
                 <CardDescription>Explore our AI-powered health screening and diagnostic services</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <ServiceCard
-                    title="General Health Screening"
-                    icon={<Microscope className="h-6 w-6" />}
-                    description="Comprehensive health check-up using AI analysis"
-                  />
-                  <ServiceCard
-                    title="Skin Disease Detection"
-                    icon={<div className="h-6 w-6 bg-brown-500 rounded-full" />}
-                    description="AI-powered analysis of skin conditions"
-                  />
-                  <ServiceCard
-                    title="Lung Disease Detection"
-                    icon={<Lungs className="h-6 w-6" />}
-                    description="Early detection of respiratory issues"
-                  />
-                  <ServiceCard
-                    title="Eye Disease Detection"
-                    icon={<Eye className="h-6 w-6" />}
-                    description="AI analysis for various eye conditions"
-                  />
-                  <ServiceCard
-                    title="Brain Disease Detection"
-                    icon={<Brain className="h-6 w-6" />}
-                    description="MRI analysis for neurological conditions"
-                  />
-                  <ServiceCard
-                    title="Bone Fracture Detection"
-                    icon={<Bone className="h-6 w-6" />}
-                    description="X-ray analysis for bone injuries"
-                  />
-                  <ServiceCard
-                    title="Breast Cancer Detection"
-                    icon={<Ribbon className="h-6 w-6" />}
-                    description="Mammogram analysis for early detection"
-                  />
+                <div className="space-y-6">
+                  {/* General Health Care */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">General Health Care</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <ServiceCard
+                        title="Comprehensive Health Screening"
+                        icon={<Microscope className="h-6 w-6" />}
+                        description="Complete health analysis using AI for vital signs, blood work, and general wellness"
+                      />
+                      <ServiceCard
+                        title="Preventive Health Analysis"
+                        icon={<Activity className="h-6 w-6" />}
+                        description="Early detection of health risks and personalized preventive measures"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Specialized External Analysis */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Specialized External Analysis</h3>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <ServiceCard
+                        title="Eye Condition Analysis"
+                        icon={<Eye className="h-6 w-6" />}
+                        description="AI analysis of eye photos for common conditions and vision problems"
+                      />
+                      <ServiceCard
+                        title="Skin Disease Detection"
+                        icon={<div className="h-6 w-6 bg-amber-100 rounded-full" />}
+                        description="Upload photos of skin conditions for instant AI analysis"
+                      />
+                      <ServiceCard
+                        title="External Symptoms Check"
+                        icon={<FileText className="h-6 w-6" />}
+                        description="Analysis of visible symptoms and physical conditions"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Medical Image Analysis */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Medical Image Analysis</h3>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <ServiceCard
+                        title="Brain MRI Analysis"
+                        icon={<Brain className="h-6 w-6" />}
+                        description="Advanced AI analysis of brain MRI scans for neurological conditions"
+                      />
+                      <ServiceCard
+                        title="Chest X-Ray Analysis"
+                        icon={<Lungs className="h-6 w-6" />}
+                        description="Detection of lung diseases and respiratory conditions"
+                      />
+                      <ServiceCard
+                        title="Mammogram Analysis"
+                        icon={<Ribbon className="h-6 w-6" />}
+                        description="Early detection of breast abnormalities and cancer screening"
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -554,7 +564,7 @@ export default function PatientDashboard() {
   )
 }
 
-function Menu(props) {
+function Menu(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -575,7 +585,7 @@ function Menu(props) {
   )
 }
 
-function StarRating({ rating }) {
+function StarRating({ rating }: { rating: number }) {
   const fullStars = Math.floor(rating)
   const hasHalfStar = rating % 1 >= 0.5
 
@@ -605,7 +615,13 @@ function StarRating({ rating }) {
   )
 }
 
-function ServiceCard({ title, icon, description }) {
+interface ServiceCardProps {
+  title: string;
+  icon: React.ReactNode;
+  description: string;
+}
+
+function ServiceCard({ title, icon, description }: ServiceCardProps) {
   return (
     <div className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-3 mb-2">

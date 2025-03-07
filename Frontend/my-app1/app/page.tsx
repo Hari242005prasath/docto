@@ -19,10 +19,10 @@ export default function Home() {
             <Link href="#how-it-works" className="text-sm font-medium hover:underline underline-offset-4">
               How It Works
             </Link>
-            <Link href="#for-doctors" className="text-sm font-medium hover:underline underline-offset-4">
+            <Link href="/doctor/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
               For Doctors
             </Link>
-            <Link href="#for-patients" className="text-sm font-medium hover:underline underline-offset-4">
+            <Link href="/patient/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
               For Patients
             </Link>
           </nav>
@@ -222,7 +222,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <div>
-                  <Link href="/doctor-signup">
+                  <Link href="/doctor/dashboard">
                     <Button size="lg">Join as a Doctor</Button>
                   </Link>
                 </div>
@@ -261,7 +261,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <div>
-                  <Link href="/patient-signup">
+                  <Link href="/patient/dashboard">
                     <Button size="lg">Sign Up as a Patient</Button>
                   </Link>
                 </div>
