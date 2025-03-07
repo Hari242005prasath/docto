@@ -21,6 +21,8 @@ import {
   Brain,
   Bone,
   Ribbon,
+  ArrowRight,
+  Stethoscope,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -81,6 +83,13 @@ export default function PatientDashboard() {
               >
                 <Lungs className="h-4 w-4" />
                 Disease Detection
+              </Link>
+              <Link
+                href="/patient/skin-detection"
+                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
+              >
+                <FileText className="h-4 w-4" />
+                Skin Disease Detection
               </Link>
             </div>
           </div>
@@ -224,9 +233,11 @@ export default function PatientDashboard() {
                     <h3 className="text-lg font-semibold mb-3">General Health Care</h3>
                     <div className="grid gap-4 md:grid-cols-2">
                       <ServiceCard
-                        title="Comprehensive Health Screening"
                         icon={<Microscope className="h-6 w-6" />}
-                        description="Complete health analysis using AI for vital signs, blood work, and general wellness"
+                        title="Comprehensive Health Screening"
+                        description="Complete health analysis using AI for symptoms and general wellness"
+                        href="/patient/comprehensive-screening"
+                        buttonText="Start Analysis"
                       />
                       <ServiceCard
                         title="Preventive Health Analysis"
@@ -623,36 +634,38 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 interface ServiceCardProps {
-  title: string;
   icon: React.ReactNode;
+  title: string;
   description: string;
+  href?: string;
+  buttonText?: string;
 }
 
-function ServiceCard({ title, icon, description }: ServiceCardProps) {
-  const getLink = () => {
-    switch (title) {
-      case "Chest X-Ray Analysis":
-        return "/patient/disease-detection";
-      default:
-        return "#";
-    }
-  };
-
-  return (
-    <Link href={getLink()}>
-      <div className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
-        <div className="flex items-center gap-3 mb-2">
-          {icon}
-          <h3 className="font-medium">{title}</h3>
-        </div>
-        <p className="text-sm text-gray-500">{description}</p>
-        <div className="mt-3">
-          <Button variant="outline" size="sm" className="w-full">
-            {title === "Chest X-Ray Analysis" ? "Start Analysis" : "Learn More"}
-          </Button>
-        </div>
+function ServiceCard({ icon, title, description, href, buttonText = "Learn More" }: ServiceCardProps) {
+  const CardContent = (
+    <div className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
+      <div className="flex items-center gap-3 mb-2">
+        {icon}
+        <h3 className="font-medium">{title}</h3>
       </div>
+      <p className="text-sm text-gray-500">{description}</p>
+      <div className="mt-3">
+        <Button 
+          variant="default" 
+          size="sm" 
+          className="w-full flex items-center justify-center gap-2"
+        >
+          {buttonText}
+          {href && <ArrowRight className="h-4 w-4" />}
+        </Button>
+      </div>
+    </div>
+  );
+
+  return href ? (
+    <Link href={href}>
+      {CardContent}
     </Link>
-  )
+  ) : CardContent;
 }
 

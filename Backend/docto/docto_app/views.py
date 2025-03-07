@@ -14,6 +14,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from io import BytesIO
 from datetime import datetime
+import joblib
+from huggingface_hub import hf_hub_download
 
 # Load environment variables
 load_dotenv()
@@ -25,9 +27,36 @@ genai.configure(api_key=GOOGLE_API_KEY)
 # Initialize Gemini model with the correct model name
 gemini_model = genai.GenerativeModel('gemini-1.5-flash')  # Updated to Gemini 1.5 Pro
 
-# Load the H5 model
-model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'lung (1).h5')
-h5_model = tf.keras.models.load_model(model_path)
+# Update this part where models are loaded
+lung_model_path = 'C:/Users/HARIPRASATH/OneDrive/Desktop/docto/lung (1).h5'
+skin_model_path = 'C:/Users/HARIPRASATH/OneDrive/Desktop/docto/skin_disease.h5'
+
+# Load lung model
+lung_model = tf.keras.models.load_model(lung_model_path, compile=False)
+lung_model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Load skin model
+skin_model = tf.keras.models.load_model(skin_model_path, compile=False)
+skin_model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Define classes for skin disease (replace these with your actual classes)
+SKIN_CLASSES = [
+    'Actinic Keratoses',
+    'Basal Cell Carcinoma',
+    'Benign Keratosis',
+    'Dermatofibroma',
+    'Melanoma',
+    'Melanocytic Nevi',
+    'Vascular naevus'
+]
 
 # Define disease classes with their corresponding indices
 CLASSES = ['Covid-19', 'Normal', 'Viral Pneumonia', 'Bacterial Pneumonia']
@@ -39,6 +68,40 @@ DISEASE_INFO = {
     'Viral Pneumonia': 'Pneumonia caused by viral infection, often less severe than bacterial pneumonia.',
     'Bacterial Pneumonia': 'Pneumonia caused by bacterial infection, typically requires antibiotic treatment.'
 }
+
+# Load the model at module level
+disease_model = joblib.load(hf_hub_download("AWeirdDev/human-disease-prediction", "sklearn_model.joblib"))
+
+# Update the SYMPTOMS list to include all 132 symptoms
+SYMPTOMS = [
+    'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills',
+    'joint_pain', 'stomach_pain', 'acidity', 'ulcers_on_tongue', 'muscle_wasting', 'vomiting',
+    'burning_micturition', 'spotting_ urination', 'fatigue', 'weight_gain', 'anxiety',
+    'cold_hands_and_feets', 'mood_swings', 'weight_loss', 'restlessness', 'lethargy',
+    'patches_in_throat', 'irregular_sugar_level', 'cough', 'high_fever', 'sunken_eyes',
+    'breathlessness', 'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish_skin',
+    'dark_urine', 'nausea', 'loss_of_appetite', 'pain_behind_the_eyes', 'back_pain', 'constipation',
+    'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellow_urine', 'yellowing_of_eyes',
+    'acute_liver_failure', 'fluid_overload', 'swelling_of_stomach', 'swelled_lymph_nodes',
+    'malaise', 'blurred_and_distorted_vision', 'phlegm', 'throat_irritation', 'redness_of_eyes',
+    'sinus_pressure', 'runny_nose', 'congestion', 'chest_pain', 'weakness_in_limbs', 'fast_heart_rate',
+    'pain_during_bowel_movements', 'pain_in_anal_region', 'bloody_stool', 'irritation_in_anus',
+    'neck_pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs', 'swollen_blood_vessels',
+    'puffy_face_and_eyes', 'enlarged_thyroid', 'brittle_nails', 'swollen_extremeties', 'excessive_hunger',
+    'extra_marital_contacts', 'drying_and_tingling_lips', 'slurred_speech', 'knee_pain', 'hip_joint_pain',
+    'muscle_weakness', 'stiff_neck', 'swelling_joints', 'movement_stiffness', 'spinning_movements',
+    'loss_of_balance', 'unsteadiness', 'weakness_of_one_body_side', 'loss_of_smell', 'bladder_discomfort',
+    'foul_smell_of urine', 'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching',
+    'toxic_look_(typhos)', 'depression', 'irritability', 'muscle_pain', 'altered_sensorium',
+    'red_spots_over_body', 'belly_pain', 'abnormal_menstruation', 'dischromic _patches',
+    'watering_from_eyes', 'increased_appetite', 'polyuria', 'family_history', 'mucoid_sputum',
+    'rusty_sputum', 'lack_of_concentration', 'visual_disturbances', 'receiving_blood_transfusion',
+    'receiving_unsterile_injections', 'coma', 'stomach_bleeding', 'distention_of_abdomen',
+    'history_of_alcohol_consumption', 'fluid_overload.1', 'blood_in_sputum', 'prominent_veins_on_calf',
+    'palpitations', 'painful_walking', 'pus_filled_pimples', 'blackheads', 'scurring', 'skin_peeling',
+    'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 'blister',
+    'red_sore_around_nose', 'yellow_crust_ooze'
+]
 
 async def get_disease_details(disease_name, location):
     try:
@@ -339,7 +402,7 @@ async def detect_disease(request):
             image_array = np.expand_dims(image_array, axis=0)
 
             # Get prediction from H5 model
-            predictions = h5_model.predict(image_array)
+            predictions = lung_model.predict(image_array)
             predicted_class_index = np.argmax(predictions[0])
             predicted_class = CLASSES[predicted_class_index]
             confidence = float(np.max(predictions[0]))
@@ -375,6 +438,116 @@ async def detect_disease(request):
         except Exception as e:
             print(f"Error processing image: {str(e)}")
             return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+@csrf_exempt
+async def detect_skin_disease(request):
+    if request.method == 'POST':
+        try:
+            image_file = request.FILES.get('image')
+            if not image_file:
+                return JsonResponse({'error': 'No image provided'}, status=400)
+
+            # Process image
+            image = Image.open(image_file)
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+            image = image.resize((224, 224))
+            image_array = np.array(image)
+            image_array = image_array / 255.0
+            image_array = np.expand_dims(image_array, axis=0)
+
+            # Get prediction
+            predictions = skin_model.predict(image_array)
+            predicted_class_index = np.argmax(predictions[0])
+            predicted_class = SKIN_CLASSES[predicted_class_index]
+            confidence = float(np.max(predictions[0]))
+
+            # Get additional information
+            details = await get_disease_details(predicted_class, 'Unknown')
+
+            # Generate PDF if requested
+            if request.POST.get('generate_pdf', 'false').lower() == 'true':
+                pdf_buffer = generate_pdf_report(
+                    predicted_class, 
+                    confidence, 
+                    details, 
+                    'Unknown',
+                    image_file
+                )
+                return FileResponse(
+                    pdf_buffer,
+                    as_attachment=True,
+                    filename=f'skin_disease_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+                )
+
+            return JsonResponse({
+                'disease': predicted_class,
+                'confidence': confidence,
+                'details': details,
+                'message': f'Detected: {predicted_class} with {confidence:.2%} confidence'
+            })
+
+        except Exception as e:
+            # Detailed error logging
+            import traceback
+            print(f"Error in skin disease detection: {str(e)}")
+            print(traceback.format_exc())
+            return JsonResponse({
+                'error': str(e),
+                'details': traceback.format_exc()
+            }, status=500)
+
+    return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+@csrf_exempt
+async def predict_disease(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            selected_symptoms = data.get('symptoms', [])
+            
+            # Create input array with all 132 features
+            input_array = [1 if symptom in selected_symptoms else 0 for symptom in SYMPTOMS]
+            input_array = np.array([input_array])  # Reshape for model input
+
+            # Make prediction
+            prediction = disease_model.predict(input_array)
+            predicted_disease = prediction[0]
+
+            # Get disease details (similar to your skin disease function)
+            details = await get_disease_details(predicted_disease, 'Unknown')
+
+            # Generate PDF if requested
+            if data.get('generate_pdf', False):
+                pdf_buffer = generate_pdf_report(
+                    predicted_disease,
+                    details,
+                    'Unknown',
+                    None
+                )
+                return FileResponse(
+                    pdf_buffer,
+                    as_attachment=True,
+                    filename=f'health_screening_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+                )
+
+            return JsonResponse({
+                'disease': predicted_disease,
+                'selected_symptoms': selected_symptoms,
+                'details': details,
+                'message': f'Predicted Disease: {predicted_disease}'
+            })
+
+        except Exception as e:
+            import traceback
+            print(f"Error in disease prediction: {str(e)}")
+            print(traceback.format_exc())
+            return JsonResponse({
+                'error': str(e),
+                'details': traceback.format_exc()
+            }, status=500)
 
     return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
 
