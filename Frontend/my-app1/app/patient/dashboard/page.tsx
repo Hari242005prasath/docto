@@ -75,6 +75,13 @@ export default function PatientDashboard() {
                 Appointments
                 <Badge className="ml-auto bg-teal-500">1</Badge>
               </Link>
+              <Link
+                href="/patient/disease-detection"
+                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
+              >
+                <Lungs className="h-4 w-4" />
+                Disease Detection
+              </Link>
             </div>
           </div>
           <div className="px-4 mb-4">
@@ -622,19 +629,30 @@ interface ServiceCardProps {
 }
 
 function ServiceCard({ title, icon, description }: ServiceCardProps) {
+  const getLink = () => {
+    switch (title) {
+      case "Chest X-Ray Analysis":
+        return "/patient/disease-detection";
+      default:
+        return "#";
+    }
+  };
+
   return (
-    <div className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
-      <div className="flex items-center gap-3 mb-2">
-        {icon}
-        <h3 className="font-medium">{title}</h3>
+    <Link href={getLink()}>
+      <div className="rounded-lg border p-4 hover:bg-gray-50 transition-colors">
+        <div className="flex items-center gap-3 mb-2">
+          {icon}
+          <h3 className="font-medium">{title}</h3>
+        </div>
+        <p className="text-sm text-gray-500">{description}</p>
+        <div className="mt-3">
+          <Button variant="outline" size="sm" className="w-full">
+            {title === "Chest X-Ray Analysis" ? "Start Analysis" : "Learn More"}
+          </Button>
+        </div>
       </div>
-      <p className="text-sm text-gray-500">{description}</p>
-      <div className="mt-3">
-        <Button variant="outline" size="sm" className="w-full">
-          Learn More
-        </Button>
-      </div>
-    </div>
+    </Link>
   )
 }
 

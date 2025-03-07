@@ -64,13 +64,11 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="mx-auto lg:mx-0 relative aspect-video overflow-hidden rounded-xl">
-                <Image
-                  src="/placeholder.svg?height=720&width=1280"
-                  alt="Medical dashboard interface"
-                  width={1280}
-                  height={720}
-                  className="object-cover"
+              <div className="max-h-[519px] max-w-[678px]">
+                <img
+                  className="custom-animate size-full object-contain"
+                  src="/hero.jpg"
+                  alt="Hero"
                 />
               </div>
             </div>
@@ -185,9 +183,9 @@ export default function Home() {
         <section id="for-doctors" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-              <div className="mx-auto lg:mx-0 relative aspect-video overflow-hidden rounded-xl">
+              <div className="max-h-[540px] max-w-[678px]">
                 <Image
-                  src="/placeholder.svg?height=720&width=1280"
+                  src="/new2.png"
                   alt="Doctor using the platform"
                   width={1280}
                   height={720}
@@ -266,9 +264,9 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="mx-auto lg:mx-0 relative aspect-video overflow-hidden rounded-xl order-1 lg:order-2">
+              <div className="max-h-[540px] max-w-[678px]">
                 <Image
-                  src="/placeholder.svg?height=720&width=1280"
+                  src="/new1.png"
                   alt="Patient using the platform"
                   width={1280}
                   height={720}
